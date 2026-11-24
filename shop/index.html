@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101719">
+<title>NEVALIS · Магазин</title>
+<style>
+@font-face{font-family:"Nevalis Pixel";src:url(../assets/e408d8b335fd1e692425bb2d.ttf) format("truetype");font-display:swap}
+@font-face{font-family:"Nevalis Archive";src:url(../assets/74059a863d3c881887177957.ttf) format("truetype");font-display:swap}
+:root{color-scheme:dark;--surface:#151e21;--panel:#1a2426;--edge:#394748;--text:#eee9dd;--muted:#b5bfbc;--signal:#d6eb98;--hot:#d28170;--pad:clamp(16px,3.3vw,50px);font-family:system-ui,sans-serif;background:#0f1518;color:var(--text)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#0c13189e 0%,#0f1518ef 46%,#0f1518 720px),url('../assets/88f0c4be403d17ad64c589c5.webp') center top/cover fixed no-repeat}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+button:disabled{opacity:.45;cursor:default}
+[hidden]{display:none!important}
+header{height:68px;padding:0 var(--pad);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #506060;background:#10191af2}
+.logo{font:normal clamp(25px,3vw,36px)/1 "Nevalis Pixel",monospace;letter-spacing:.025em;color:#f9ecd2;text-shadow:2px 2px #0b1111}
+.shop-return{color:var(--signal);font-size:14px;text-underline-offset:4px}html.embedded header{display:none}
+main{max-width:1360px;margin:auto;padding:26px var(--pad) 44px}
+h1{font-size:clamp(27px,4vw,42px);letter-spacing:-.035em;margin:0 0 17px;line-height:1.05}
+h2{font-size:clamp(20px,3vw,32px);line-height:1.14;margin:0;letter-spacing:-.025em}
+h3{font-size:17px;line-height:1.25;margin:0}
+p{line-height:1.45}
+.tabs{display:flex;overflow:auto;scrollbar-width:thin;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--edge)}
+.tabs button{padding:12px clamp(10px,2vw,22px);white-space:nowrap;border:0;border-bottom:3px solid transparent;background:#141e22;color:var(--muted);font-weight:650}
+.tabs button[aria-pressed="true"]{color:var(--signal);border-bottom-color:var(--signal);background:#28312c}
+.panel{border:1px solid var(--edge);background:var(--surface);min-width:0;box-shadow:0 10px 24px #060b0d4d}
+.poster-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.92fr);min-height:365px}
+.poster-stage{position:relative;display:grid;place-items:center;min-height:335px;padding:24px 59px;background:radial-gradient(ellipse at 48% 40%,#354745,#172125 73%);overflow:hidden}
+.poster-stage::before,.shirt-stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.28;background:repeating-linear-gradient(0deg,transparent 0 3px,#0b131630 3px 4px)}
+.sheet{position:relative;display:grid;place-items:center;max-width:100%;padding:clamp(10px,2vw,20px);background:#f1eadb;box-shadow:0 12px 25px #05090caa;transform:rotate(-1deg)}
+.sheet img{display:block;max-width:min(100%,400px);max-height:clamp(240px,43vh,390px);height:auto;object-fit:contain}
+.arrow{width:41px;min-width:41px;min-height:43px;background:#162225f0;border:1px solid #728481;border-radius:2px;color:var(--signal);font-size:24px;line-height:1;display:grid;place-items:center}
+.poster-stage .arrow{position:absolute;top:calc(50% - 21px)}
+#posterPrev{left:11px}#posterNext{right:11px}
+.poster-info{padding:clamp(18px,3vw,34px);display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--edge)}
+.counter{font:700 14px ui-monospace,monospace;color:var(--signal);margin:0 0 10px}
+.meta{color:var(--muted);font-size:14px}
+.sizes{display:flex;flex-wrap:wrap;gap:8px;margin-top:1px}
+.sizes span{font:700 14px ui-monospace,monospace;color:#e9ebd9;border:1px solid #52605a;background:#202d2c;padding:8px 12px}
+.order-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px}
+.poster-info .order-actions{margin:16px 0 0}
+.shirts .order-actions{grid-column:1/-1;margin:0}
+.order-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 17px;background:#d6eb98;border:1px solid #e8f4bd;box-shadow:2px 2px 0 #607345;color:#162018;text-decoration:none;font-weight:750}
+.order-button:hover{background:#ecf7c6}
+.order-contact{display:inline-flex;align-items:center;min-height:44px;color:var(--signal);text-underline-offset:4px;font:650 14px ui-monospace,monospace}
+.order-actions a:focus-visible{outline:2px solid var(--signal);outline-offset:4px}
+.thumb-strip{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px;margin-top:12px}
+.thumb{min-width:0;padding:5px;border:1px solid #465450;background:#172226;min-height:57px}
+.thumb[aria-pressed="true"]{border-color:var(--signal);box-shadow:inset 0 -2px var(--signal)}
+.thumb img{display:block;width:100%;height:clamp(34px,6.5vh,70px);object-fit:contain}
+.shirts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.shirt{padding:14px;display:flex;flex-direction:column}
+.shirt h2{font-size:clamp(17px,2.5vw,23px);margin:1px 0 10px}
+.shirt-stage{position:relative;isolation:isolate;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 45% 40%,#43524d,#212d30 73%);min-height:190px}
+.garment{position:relative;width:min(90%,355px);margin:9px auto}
+.garment>img:first-child{display:block;width:100%;height:auto}
+.garment .print{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);width:26%;aspect-ratio:1;object-fit:contain}
+.garment .print.cool-bugs{width:21%}
+.design-label{font-size:14px;color:var(--muted);margin:12px 0 6px}
+.design-select{width:100%;min-height:42px;padding:7px 10px;border:1px solid #62746c;background:#182323;border-radius:2px;font:inherit;color:var(--text)}
+.stickers-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pack{padding:16px}
+.pack h2,.sticker-singles h2{font-size:21px;margin-bottom:14px}
+.pack-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.sticker-singles{margin-top:19px;padding:16px}
+.singles-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.sticker-tile{min-width:0;text-align:center;padding:8px 3px;background:#121d20}
+.sticker-tile img{display:block;height:88px;width:100%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(1.5px 0 #f4ead4) drop-shadow(-1.5px 0 #f4ead4) drop-shadow(0 1.5px #f4ead4) drop-shadow(0 -1.5px #f4ead4)}
+.sticker-tile p{font-size:13px;line-height:1.25;margin:8px 0 0;overflow-wrap:anywhere}
+.deck-header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 14px}
+.deck-header .meta{margin:0}
+.rules{margin:0 0 16px;padding:12px 15px}
+.rules summary{color:var(--signal);font-weight:750;cursor:pointer}
+.rules summary:focus-visible{outline:2px solid var(--signal);outline-offset:4px}
+.rules-inner{max-width:76ch;line-height:1.5;font-size:15px}
+.rules-inner h3{margin-top:13px}
+.rules-inner ol,.rules-inner ul{padding-left:22px}
+.rules-inner li{margin:7px 0}
+.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,165px),1fr));gap:12px}
+.card-frame{border:2px solid #73856b;box-shadow:inset 0 0 0 4px #0e181b;background:radial-gradient(ellipse at 50% 40%,#314743,#142225 72%);position:relative}
+.card-frame::after{content:"";position:absolute;inset:6px;pointer-events:none;border:1px dashed #647b64}
+.anomaly-face{--ink:#95d7cf;--wash:#214544;--archive-font:"Nevalis Archive",ui-monospace,monospace;border:1px solid var(--ink);background:#10191b;box-shadow:inset 0 0 0 3px #10191b,inset 0 0 0 4px #ffffff25,0 8px 20px #05090b70}
+.anomaly-face[data-zone="street"]{--ink:#9cb8ee;--wash:#252e52}
+.anomaly-face[data-zone="workshop"]{--ink:#f2b382;--wash:#512e27}
+.anomaly-face[data-zone="ruins"]{--ink:#c6dd8a;--wash:#384629}
+.anomaly-face[data-zone="rift"]{--ink:#ff9c95;--wash:#592a35}
+.anomaly-face::after{inset:3px;border:0;opacity:.95;background:
+ linear-gradient(var(--ink),var(--ink)) top left/12px 2px,linear-gradient(var(--ink),var(--ink)) top left/2px 12px,
+ linear-gradient(var(--ink),var(--ink)) top right/12px 2px,linear-gradient(var(--ink),var(--ink)) top right/2px 12px,
+ linear-gradient(var(--ink),var(--ink)) bottom left/12px 2px,linear-gradient(var(--ink),var(--ink)) bottom left/2px 12px,
+ linear-gradient(var(--ink),var(--ink)) bottom right/12px 2px,linear-gradient(var(--ink),var(--ink)) bottom right/2px 12px;
+ background-repeat:no-repeat}
+.anomaly-face .portrait{display:grid;place-items:center;position:relative;min-width:0;isolation:isolate;overflow:hidden;border:1px solid #ffffff28;background:
+ repeating-linear-gradient(0deg,#03070929 0 1px,transparent 1px 4px),
+ radial-gradient(ellipse at 50% 49%,var(--wash) 0%,#101b20 74%)}
+.portrait::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.32;background:
+ linear-gradient(90deg,transparent 49.8%,var(--ink) 49.8% 50.2%,transparent 50.2%),
+ linear-gradient(0deg,transparent 49.8%,var(--ink) 49.8% 50.2%,transparent 50.2%);
+ mask-image:radial-gradient(ellipse,transparent 17%,#000 58%,transparent 78%)}
+.portrait img{display:block;width:100%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(3px 4px 0 #080c10b0)}
+.anomaly-face .card-title{font-family:var(--archive-font);font-weight:400;text-transform:uppercase;overflow-wrap:anywhere;color:#f6efdf;text-shadow:1px 2px #000}
+.anomaly-face .card-zone{color:var(--ink);font:600 12px/1.3 ui-monospace,monospace}
+.deck-tile{display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:left;width:100%;min-width:0;min-height:219px;padding:12px}
+.deck-tile:hover{background:var(--wash)}
+.deck-tile .portrait{height:120px}
+.deck-tile img{position:absolute;inset:7px;width:calc(100% - 14px);height:calc(100% - 14px)}
+.deck-tile .card-title{display:block;font-size:16px;line-height:1.2}
+.deck-tile small{display:block;font-size:12px;margin-top:5px}
+.deck-tile .tile-effect{margin-top:auto;border-top:1px solid #ffffff38;padding-top:6px;color:var(--ink);font:650 11px/1.3 ui-monospace,monospace}
+dialog{max-width:calc(100vw - 24px);width:600px;max-height:calc(100dvh - 24px);overflow:auto;padding:16px;background:#142123;border:1px solid #667f73;color:var(--text)}
+dialog::backdrop{background:#080e10da}
+.dialog-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
+.dialog-bar button,.flip{padding:8px 12px;min-height:42px;background:#253631;border:1px solid #677d6e;border-radius:2px}
+.dialog-bar button{font-size:14px}
+.card-detail{width:min(100%,330px);min-height:min(390px,55dvh);margin:auto;padding:25px;display:flex;flex-direction:column;justify-content:center}
+.card-detail img{width:100%;height:min(220px,31dvh);object-fit:contain;image-rendering:pixelated}
+.card-detail h3{font-size:20px;margin-top:20px}
+.card-detail p{margin:10px 0 0;color:#e6e3d5;font-size:15px}
+.card-detail .street{color:var(--signal);font-size:14px}
+.anomaly-card{width:min(100%,405px);padding:14px;display:grid;gap:11px;margin:auto}
+.anomaly-card .card-title{font-size:clamp(20px,4vw,27px);line-height:1.18;margin:3px 0 0}
+.anomaly-card .portrait{height:clamp(132px,23dvh,217px);padding:9px 14px}
+.anomaly-card .portrait img{height:100%;max-height:calc(clamp(132px,23dvh,217px) - 18px)}
+.anomaly-card .effect{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;align-items:center;padding:8px;border:1px solid #ffffff30;background:var(--wash)}
+.effect .power-value{display:grid;min-height:42px;place-items:center;border:1px solid var(--ink);background:#10191b;color:var(--ink);font:400 29px/1 var(--archive-font)}
+.effect .power-type{display:block;color:var(--ink);font:400 13px/1.25 var(--archive-font);text-transform:uppercase}
+.effect .power-name{display:block;margin-top:3px;font-size:15px}
+.anomaly-card .effect-rule{margin:0;padding:0 2px 2px;font-size:15px;color:#f1ecdf}
+.card-unlock{width:min(100%,405px);margin:10px auto 0;display:grid;gap:7px}
+.card-unlock p{font-size:14px;margin:0}
+.card-unlock p span{color:var(--signal);display:block;font:650 12px/1.6 ui-monospace,monospace}
+.card-unlock .collect{padding:8px;min-height:42px;color:var(--signal);background:#253631;border:1px solid #677d6e}
+.card-unlock .collect:disabled{opacity:1;color:var(--muted)}
+.deck-tile .collected{color:var(--muted);margin-top:5px}
+.actions{display:flex;align-items:center;justify-content:center;gap:8px;margin:13px 0 0}
+.flip{min-width:155px;color:var(--signal)}
+@media(max-width:680px){
+ header{height:54px}main{padding-top:18px}
+ .poster-layout{grid-template-columns:minmax(0,1fr);min-height:0}
+ .poster-stage{min-height:0;padding:14px 46px}.sheet{padding:11px}.sheet img{max-height:251px}
+ .poster-info{border-left:0;border-top:1px solid var(--edge);padding:13px}.poster-info .meta{margin:7px 0}
+ .thumb-strip{grid-template-columns:repeat(9,minmax(38px,1fr));gap:4px;overflow:auto}
+ .thumb{min-height:42px;padding:3px}.thumb img{height:34px}
+ .shirts{gap:8px}.shirt{padding:8px}.shirt-stage{min-height:116px}
+ .design-select{font-size:14px;padding:3px}.stickers-grid{grid-template-columns:1fr}
+ .singles-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.deck{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+<header><span class="logo">NEVALIS</span><a class="shop-return" href="../">К прогулке</a></header>
+<main>
+ <h1>Магазин</h1>
+ <nav class="tabs" aria-label="Разделы магазина">
+  <button type="button" data-tab="posters" aria-pressed="true">Постеры</button>
+  <button type="button" data-tab="shirts" aria-pressed="false">Футболки</button>
+  <button type="button" data-tab="stickers" aria-pressed="false">Стикеры</button>
+  <button type="button" data-tab="deck" aria-pressed="false">Колода аномалий</button>
+ </nav>
+ <section id="posters" aria-label="Постеры">
+  <div class="panel poster-layout">
+   <div class="poster-stage">
+    <div class="sheet"><img id="posterImage" alt=""></div>
+    <button class="arrow" id="posterPrev" type="button" aria-label="Предыдущий постер">‹</button>
+    <button class="arrow" id="posterNext" type="button" aria-label="Следующий постер">›</button>
+   </div>
+   <div class="poster-info" aria-live="polite">
+    <p id="posterCounter" class="counter"></p>
+    <h2 id="posterTitle"></h2>
+    <p class="meta">Оригинал Акима Небылицына</p>
+    <p class="meta">Форматы для заказа</p>
+    <div class="sizes"><span>A4</span><span>A3</span><span>A2</span></div>
+    <div class="order-actions">
+   <a class="order-button" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer">Заказать</a>
+   <a class="order-contact" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer" aria-label="Telegram @kukiminer">@kukiminer</a>
+  </div>
+   </div>
+  </div>
+  <div id="posterThumbnails" class="thumb-strip" aria-label="Выбрать постер"></div>
+ </section>
+ <section id="shirts" class="shirts" aria-label="Футболки" hidden>
+  <div class="order-actions">
+   <a class="order-button" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer">Заказать</a>
+   <a class="order-contact" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer" aria-label="Telegram @kukiminer">@kukiminer</a>
+  </div>
+  <article class="panel shirt" data-shirt="0">
+   <h2>Чёрная · принт на спине</h2>
+   <div class="shirt-stage"><div class="garment black"><img class="blank" alt="Чёрная футболка со спины"><img class="print" alt=""></div></div>
+   <label class="design-label" for="blackDesign">Рисунок на чёрной</label>
+   <select class="design-select" id="blackDesign"></select>
+  </article>
+  <article class="panel shirt" data-shirt="1">
+   <h2>Белая · принт на груди</h2>
+   <div class="shirt-stage"><div class="garment white"><img class="blank" alt="Белая футболка спереди"><img class="print" alt=""></div></div>
+   <label class="design-label" for="whiteDesign">Рисунок на белой</label>
+   <select class="design-select" id="whiteDesign"></select>
+  </article>
+ </section>
+ <section id="stickers" aria-label="Стикеры" hidden>
+  <div class="order-actions">
+   <a class="order-button" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer">Заказать</a>
+   <a class="order-contact" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer" aria-label="Telegram @kukiminer">@kukiminer</a>
+  </div>
+  <div id="packs" class="stickers-grid"></div>
+  <div class="panel sticker-singles"><h2>Фигурные стикеры</h2><div id="singles" class="singles-grid"></div></div>
+ </section>
+ <section id="deck" aria-label="Колода аномалий" hidden>
+  <div class="deck-header"><h2>Колода аномалий</h2><p id="deckCount" class="meta" aria-live="polite"></p></div>
+  <div class="order-actions">
+   <a class="order-button" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer">Заказать</a>
+   <a class="order-contact" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer" aria-label="Telegram @kukiminer">@kukiminer</a>
+  </div>
+  <details class="panel rules">
+   <summary>Правила настольной игры · 2–5 игроков</summary>
+   <div class="rules-inner">
+    <h3>Подготовка</h3>
+    <ol>
+     <li><strong>На 2–3 игроков</strong> возьмите 18 карт. <strong>На 4–5 игроков</strong> смешайте два комплекта и уберите второго Создателя. В общей колоде будет 35 карт.</li>
+     <li>Раздайте по 3 карты в закрытую. У каждого в начале 10 здоровья и 0 щитов. Записывайте их на бумаге или отмечайте фишками. Случайно выберите первого игрока, дальше ходите по часовой стрелке.</li>
+    </ol>
+    <h3>Ход</h3>
+    <ol>
+     <li>Примените эффекты начала хода, затем возьмите 1 карту. Выберите одно действие: сыграйте карту из руки и выполните её эффект или нанесите соседу 1 урон обычной атакой.</li>
+     <li>Если карта действует сразу, отправьте её в открытый сброс после розыгрыша. Если эффект ждёт срабатывания, положите карту открыто рядом с тем, кого она затрагивает. Отправьте её в сброс после срабатывания или окончания срока. Если розыгрыш невозможен из-за отсутствия цели, его можно заменить обычной атакой.</li>
+     <li>В конце хода оставьте в руке не больше 6 карт. Когда нужно взять или посмотреть карту из пустой колоды, перемешайте сброс и положите на её место. Если и сброс пуст, выполните столько действий с колодой, сколько возможно.</li>
+    </ol>
+    <h3>Цели, урон и победа</h3>
+    <ul>
+     <li>Соседи — ближайшие оставшиеся в игре участники слева и справа. Все направленные эффекты применяются только к себе или к указанному на карте соседу. При игре вдвоём у каждого один сосед.</li>
+     <li>Каждый щит поглощает 1 урон и расходуется. Урон в обход щитов сразу снимает здоровье. Здоровье можно восстановить до 10, щиты накапливаются до 4.</li>
+     <li>Сначала выполните все части сыгранной карты и сработавшие реакции в порядке их выкладывания, затем проверьте здоровье. Игрок с 0 здоровья или ниже выбывает. Отправьте в сброс его руку и все открытые карты с эффектами, которые он разыграл или которые действуют на него. Побеждает последний оставшийся. Если все оставшиеся выбыли одновременно, партия заканчивается вничью.</li>
+    </ul>
+   </div>
+  </details>
+  <div id="deckGrid" class="deck"></div>
+ </section>
+</main>
+<dialog id="cardDialog" aria-labelledby="dialogTitle">
+ <div class="dialog-bar"><h3 id="dialogTitle">Карточка аномалии</h3><button id="closeCard" type="button">Закрыть</button></div>
+ <div id="cardFront">
+  <article class="card-frame anomaly-face anomaly-card" id="anomalyFace">
+   <div><span class="card-zone" id="cardStreet"></span><h3 class="card-title" id="cardName"></h3></div>
+   <div class="portrait"><img id="cardPicture" alt=""></div>
+   <div class="effect"><strong class="power-value" id="effectPoints"></strong><div><span class="power-type" id="effectType"></span><strong class="power-name" id="effectName"></strong></div></div>
+   <p class="effect-rule" id="effectRule"></p>
+  </article>
+  <div class="card-unlock">
+   <p><span>Как получить в прогулке</span><b id="unlockRule"></b></p>
+   <button class="collect" id="collectCard" type="button">Получить в макете</button>
+  </div>
+ </div>
+ <article class="card-frame card-detail" id="cardBack" hidden><h3>Записка исследователей</h3><p class="street" id="recordStreet"></p><p id="recordBody"></p></article>
+ <div class="actions">
+  <button id="cardPrev" class="arrow" type="button" aria-label="Предыдущая карта">‹</button>
+  <button id="flipCard" class="flip" type="button" aria-pressed="false">Читать оборот</button>
+  <button id="cardNext" class="arrow" type="button" aria-label="Следующая карта">›</button>
+ </div>
+</dialog>
+<script>
+if(window.parent!==window){
+ document.documentElement.classList.add('embedded');
+ addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&!document.querySelector('#cardDialog').open){
+   event.preventDefault();
+   window.parent.postMessage('nevalis-close-shop',location.origin);
+  }
+ });
+}
+const posters=[{"title": "Cool bugs", "src": "../assets/b7fc5c89063898d7045ed606.webp"}, {"title": "Абстрактная композиция", "src": "../assets/f2d43e1365fe4cade8ae5307.webp"}, {"title": "Скетч на красном фоне", "src": "../assets/1775637bfd2c539dc1db9270.webp"}, {"title": "Печенье", "src": "../assets/4b910b3eae2a2acdb99ee52d.webp"}, {"title": "Оранжевое растительное существо", "src": "../assets/a9e45d8831bb89f0d59be14c.webp", "printSrc": "../assets/3550ac6f7de6993711328448.webp"}, {"title": "Органическо-механическое существо", "src": "../assets/ecdd1ea4c95ca93611b8de21.webp"}, {"title": "Мадам Квак", "src": "../assets/77157b1d78643f75fd29056b.webp"}, {"title": "Существо, напоминающее муравья", "src": "../assets/23669692ec13e521b2f35375.webp"}, {"title": "Биомеханическая голова", "src": "../assets/4a9ca7ca22ea2446adbcf7c8.webp"}];
+const cards=[{"id": "frog", "title": "Лягушкообразное существо", "street": "ул. Заброшенный пост", "body": "Первый раз услышали кваканье из-под капота. Двигатель был снят ещё до закрытия КПП. На следующий день существо повторило сигнал старого клаксона, и охранник по привычке поднял шлагбаум.", "src": "../assets/5783b4eb37fd4a4d2323ca2d.webp"}, {"id": "eyes", "title": "Большеглазое существо", "street": "ул. Заброшенный пост", "body": "За бетонным блоком видны два глаза. При осмотре с двух сторон один наблюдатель всегда видел левый глаз, другой — тоже левый. Объект просьба пока считать одним.", "src": "../assets/68f6caf8c4f4af27fdbe89bd.webp"}, {"id": "kwak", "title": "Мадам Квак", "street": "ул. Заброшенный пост", "body": "В 03:12 в нижней части окна появилась Мадам Квак. Стажёр помахал ей. Наутро на стекле с внутренней стороны нашли отпечаток его ладони.", "src": "../assets/399918307ff03c82bd390e76.webp"}, {"id": "bull", "title": "Бык", "street": "ул. Первой аномалии", "body": "Бык бросается на всё, что движется. Вчера он трижды протаранил ворота, перепутав своё отражение с соперником. В четвёртый раз ворота уже были открыты, но он всё равно разогнался и ударил в косяк. В отчёте записали: «Агрессивен. Учится медленно».", "src": "../assets/2b2544d498af8e0a3eaab239.webp"}, {"id": "robot", "title": "Робот.EXE", "street": "ул. Первой аномалии", "body": "Первая группа собрала Робота.EXE из местных аномалий и тела погибшего товарища. Машина должна была прокладывать дорогу там, где человек уже не мог пройти. На первом испытании она вывела двоих из цеха, а потом ушла обратно одна. На вопрос «зачем?» по рации прозвучало имя третьего.", "src": "../assets/bfac5e01594d1c87a5d05bed.webp"}, {"id": "organic", "title": "Органическо-механическое существо", "street": "ул. Первой аномалии", "body": "На рассвете из-под крана иногда слышен тонкий свист. Существо приподнимает голову, поворачивается вслед за светом и уходит вдоль труб. На группу оно пока не реагировало, даже когда мы стояли совсем рядом.", "src": "../assets/5b8eeed83d100c0ffcc50c17.webp"}, {"id": "bird", "title": "Птица", "street": "ул. Первой аномалии", "body": "Красная птица появляется, когда в витках кабеля гаснет свет. На кадре после её взлёта в пыли остаётся один след, похожий на отпечаток крыла. Следов лап пока нет.", "src": "../assets/8e9efd5ae801107da69438cc.webp"}, {"id": "bolvanchik", "title": "Болванчик", "street": "ул. Сущностей", "body": "Положили перед нишей гайку, чтобы отметить расстояние до стены. Из темноты вытянулась рука, взяла гайку и положила её на два сантиметра ближе. Третий замер мы не проводили.", "src": "../assets/3a5f962f5569e823dacd9f04.webp"}, {"id": "toothy", "title": "Зубастик", "street": "ул. Сущностей", "body": "При свете фонаря различимы швы на мешковине. Нитка, оставленная на подоконнике, к утру исчезла. На следующей фотографии у существа появился ещё один шов, точно под левым глазом.", "src": "../assets/9a1ea5d8dab87494ee874b3c.webp"}, {"id": "head-panel", "title": "Биомеханическая голова", "street": "ул. Сущностей", "body": "На обороте рисунка стоит дата: 2026 год. Подписи нет, только исправления поверх ранних контуров. Возможно, это одна из первых разработок Создателя аномальной зоны, когда о нём ещё никто не знал.", "src": "../assets/f002ff35c5a205f4e17f5526.webp"}, {"id": "elongated", "title": "Существо с вытянутой головой", "street": "ул. Сущностей", "body": "Когда прожектор направили на стену, существо повернуло голову в тень. Повторили опыт с двух сторон: голову удалось увидеть целиком, но на обоих снимках она снята в профиль.", "src": "../assets/c935f48e22aec4914ee74abe.webp"}, {"id": "plant", "title": "Оранжевое растительное существо", "street": "ул. Надежды", "body": "Поставили горшок на метку у плиты. Через час горшок стоял там же, а метка оказалась на три сантиметра правее. Проверили линейку. Линейка тоже пустила корни.", "src": "../assets/968018ffeeaa05dca72eae8e.webp"}, {"id": "root-eater", "title": "Корнеед", "street": "ул. Надежды", "body": "Там, где прошёл Корнеед, красные корни аномалии обрываются, будто их перекусили у самой земли. Говорят, хозяин этого мира уже много лет пытается его отловить. Расставленные ловушки находят пустыми: Корнеед съедает корни под ними, и те проваливаются в землю.", "src": "../assets/53b615a92146a353ab839e10.webp"}, {"id": "gertomor", "title": "Гертомор", "street": "ул. Надежды", "body": "Приняли Гертомора за злую морковку и взялись за ботву. Он вывернулся, прокусил сапог и потащил агронома под лестницу. Агроном выскочил из сапога и убежал. К утру Гертомор снова торчал в клумбе с окровавленным шнурком в зубах. С тех пор ходим мимо клумбы только по двое.", "src": "../assets/0df8fa2708715f5475f96a69.webp"}, {"id": "unicorn", "title": "Единорог", "street": "ул. Надежды", "body": "По легенде, Единорог однажды снял рог, чтобы пролезть под аркой, и больше за ним не вернулся. Мы нашли арку и измерили проём. Рог бы прошёл. Единорог, когда мы ему это сказали, посмотрел так, будто рога у него никогда и не было.", "src": "../assets/63091774d23b22b6fdbd44cf.webp"}, {"id": "nosach", "title": "Носач", "street": "ул. Надежды", "body": "Дежурный потерял варежку. Носач принюхался и через час притащил целых семь: соседскую, детскую и одну, связанную на большой палец Носача. Свою дежурный так и не нашёл, зато вечером вернулся с двумя горячими пирожками. С тех пор они завтракают вместе.", "src": "../assets/11a975df92733373d7e2b686.webp"}, {"id": "ant-panel", "title": "Существо, напоминающее муравья", "street": "ул. Смирения", "body": "Вечером один из исследователей оставил кусочек сахара в кружке недопитого чая. Утром сахара уже не было, а по стенке кружки мокрые муравьи шли вверх, к потолку. Последний в цепочке нёс чайную ложку.", "src": "../assets/808bd9e266a9091a10f55a0a.webp"}, {"id": "double", "title": "Создатель аномальной зоны", "street": "ул. Смирения", "body": "В конце улицы свидетели видели, как Создатель раздвинул края разлома. В журнале осталась только его реплика: «Ты дошёл до конца, но выход здесь не предусмотрен...)».", "src": "../assets/e2b2bd35451013420c6d5e1c.webp"}];
+const shirtImages=["../assets/2491549f0ad35b90b731d2e8.webp", "../assets/0b1a1c289a1e36381ad1a70a.webp"];
+const byId=new Map(cards.map(card=>[card.id,card]));
+const find=id=>document.getElementById(id);
+const tabs=[...document.querySelectorAll('[data-tab]')];
+let activeTab='posters';
+for(const button of tabs)button.addEventListener('click',()=>{
+ activeTab=button.dataset.tab;
+ for(const tab of tabs){
+  const active=tab===button;
+  tab.setAttribute('aria-pressed',String(active));
+  find(tab.dataset.tab).hidden=!active;
+ }
+});
+function image(src,alt=''){
+ const element=document.createElement('img');
+ element.src=src;
+ element.alt=alt;
+ element.decoding='async';
+ return element;
+}
+let posterIndex=0;
+const thumbs=posters.map((work,i)=>{
+ const button=document.createElement('button');
+ button.type='button';
+ button.className='thumb';
+ button.setAttribute('aria-label',work.title);
+ button.title=work.title;
+ button.append(image(work.src));
+ button.onclick=()=>showPoster(i);
+ find('posterThumbnails').append(button);
+ return button;
+});
+function showPoster(index){
+ posterIndex=(index+posters.length)%posters.length;
+ const poster=posters[posterIndex];
+ const picture=find('posterImage');
+ picture.src=poster.src;
+ picture.alt=poster.title;
+ find('posterTitle').textContent=poster.title;
+ find('posterCounter').textContent=String(posterIndex+1).padStart(2,'0')+' / '+String(posters.length).padStart(2,'0');
+ thumbs.forEach((button,i)=>button.setAttribute('aria-pressed',String(i===posterIndex)));
+}
+find('posterPrev').onclick=()=>showPoster(posterIndex-1);
+find('posterNext').onclick=()=>showPoster(posterIndex+1);
+showPoster(0);
+for(const garment of document.querySelectorAll('[data-shirt]')){
+ const i=Number(garment.dataset.shirt);
+ const select=garment.querySelector('select');
+ const print=garment.querySelector('.print');
+ garment.querySelector('.blank').src=shirtImages[i];
+ posters.slice(0,5).forEach((work,j)=>select.add(new Option(work.title,String(j))));
+ function apply(){
+  const j=Number(select.value), work=posters[j];
+  print.src=work.printSrc??work.src;
+  print.alt=work.title+' — примерка принта';
+  print.classList.toggle('cool-bugs',j===0);
+ }
+ select.value=i===0?'0':'4';
+ select.onchange=apply;
+ apply();
+}
+function sticker(id){
+ const card=byId.get(id);
+ const box=document.createElement('div');
+ box.className='sticker-tile';
+ const label=document.createElement('p');
+ label.textContent=card.title;
+ box.append(image(card.src),label);
+ return box;
+}
+const packs=[
+ ['Заброшенный пост',['kwak','frog','eyes']],
+ ['Сущности цеха',['bird','bolvanchik','toothy','organic']],
+ ['Красные корни',['root-eater','gertomor','plant','nosach']]
+];
+for(const [title,ids] of packs){
+ const pack=document.createElement('article');
+ pack.className='panel pack';
+ const heading=document.createElement('h2');
+ heading.textContent=title;
+ const tiles=document.createElement('div');
+ tiles.className='pack-items';
+ tiles.append(...ids.map(sticker));
+ pack.append(heading,tiles);
+ find('packs').append(pack);
+}
+find('singles').append(...['kwak','bird','nosach','plant','ant-panel'].map(sticker));
+
+const dialog=find('cardDialog');
+// Each rule describes what changes when this card is played.
+const effects={
+ 'frog':['Прыжок','Уклонение · 1','До начала твоего следующего хода отмени первый урон от противника. Щиты при этом не расходуются.','Осмотри пространство за машиной на Заброшенном посту.'],
+ 'eyes':['Разведка','Осмотр · 3','Посмотри до 3 верхних карт колоды. Одну возьми в руку, остальные верни наверх в любом порядке.','Найди большеглазое существо у КПП и открой его запись.'],
+ 'kwak':['Забота Мадам Квак','Лечение · 3','Восстанови себе 3 здоровья.','Открой записку Мадам Квак на Заброшенном посту.'],
+ 'bull':['Таран','Урон · 3','Нанеси 3 урона одному соседу.','Открой запись Быка на улице Первой аномалии.'],
+ 'robot':['Ответный удар','Ответный урон · 2','До начала твоего следующего хода, когда впервые потеряешь здоровье от обычной атаки или карты «Урон», нанеси 2 урона тому, кто атаковал. Ответный урон не запускает другие ответные удары.','Прочитай, зачем экспедиция собрала Робота.EXE.'],
+ 'organic':['Свист на рассвете','Помеха · 1 ход','До конца своего следующего хода выбранный сосед не может сыграть карту с пометкой «Урон». Обычная атака ему доступна.','Найди органическо-механическое существо и дочитай записку о его свисте.'],
+ 'bird':['Попутный ветер','Добор · 2','Возьми 2 карты из колоды.','Открой запись Птицы на улице Первой аномалии.'],
+ 'bolvanchik':['Приманка','Урон · 2','Выбранный сосед сбрасывает одну карту по своему выбору или получает 2 урона. Если рука пуста, он получает урон.','Открой запись Болванчика на улице Сущностей.'],
+ 'toothy':['Укус','Урон · 2','Нанеси 2 урона одному соседу и возьми 1 карту.','Открой запись Зубастика на улице Сущностей.'],
+ 'head-panel':['Пересборка','Возврат · 1','Возьми из сброса 1 карту. Если сброс пуст, возьми верхнюю карту колоды.','Прочитай записку о раннем наброске Создателя.'],
+ 'elongated':['Подслушивание','Разведка · 1','Посмотри 1 случайную карту из руки выбранного соседа и верни её ему. Затем возьми 1 карту из колоды.','Открой запись существа с вытянутой головой на улице Сущностей.'],
+ 'plant':['Росток','Щит · 2','Получи 1 щит сейчас и ещё 1 в начале своего следующего хода.','Открой запись оранжевого существа на улице Надежды.'],
+ 'root-eater':['Корнеед','Снятие щита · 2','Сними до 2 щитов с одного соседа. Затем возьми 1 карту.','Прочитай, почему Создатель охотится на Корнееда.'],
+ 'gertomor':['Кровавый урожай','Урон · 4','Нанеси 4 урона одному соседу и потеряй 1 здоровье в обход своих щитов.','Открой записку о Гертоморе на улице Надежды.'],
+ 'unicorn':['Невидимый рог','Щит · 2','Получи 2 щита сразу.','Дочитай легенду о роге Единорога.'],
+ 'nosach':['Два пирожка','Лечение или щит · 2','За каждый из двух пирожков выбери: восстановить 1 здоровье или получить 1 щит.','Прочитай записку Носача до конца.'],
+ 'ant-panel':['Сахарный след','Урон · 2','Нанеси 2 урона одному соседу в обход его щитов.','Найди существо на улице Смирения и прочитай, что случилось с кружкой чая.'],
+ 'double':['Разлом','Урон · 5','Начиная с третьего своего хода, нанеси 5 урона одному соседу. После применения убери эту карту до конца партии.','Нажми на Создателя у разлома и прочитай его финальную реплику.']
+};
+const cardZones={
+ 'ул. Заброшенный пост':'post',
+ 'ул. Первой аномалии':'street',
+ 'ул. Сущностей':'workshop',
+ 'ул. Надежды':'ruins',
+ 'ул. Смирения':'rift'
+};
+const thumbnailTitles={
+ 'frog':'Лягушко\u00adобразное существо',
+ 'head-panel':'Биомеха\u00adническая голова'
+};
+const collectionKey='nevalis-merch-collection-v1';
+function loadCollection(){
+ try{
+  const stored=JSON.parse(localStorage.getItem(collectionKey)||'[]');
+  return Array.isArray(stored)?stored.filter(id=>byId.has(id)):[];
+ }catch{return []}
+}
+const collection=new Set(loadCollection());
+const collectionLabels=new Map();
+const collect=find('collectCard');
+function updateCollection(){
+ find('deckCount').textContent=`Собрано ${collection.size} из ${cards.length}`;
+ for(const [id,label] of collectionLabels)label.hidden=!collection.has(id);
+ const owned=collection.has(cards[cardIndex].id);
+ collect.disabled=owned;
+ collect.textContent=owned?'В коллекции':'Получить в макете';
+}
+let cardIndex=0;
+function flip(showBack){
+ find('cardFront').hidden=showBack;
+ find('cardBack').hidden=!showBack;
+ find('flipCard').textContent=showBack?'Показать лицо':'Читать оборот';
+ find('flipCard').setAttribute('aria-pressed',String(showBack));
+}
+function showCard(index){
+ cardIndex=(index+cards.length)%cards.length;
+ const card=cards[cardIndex];
+ find('anomalyFace').dataset.zone=cardZones[card.street];
+ find('cardPicture').src=card.src;
+ find('cardPicture').alt=card.title;
+ find('cardName').textContent=card.title;
+ find('cardStreet').textContent=card.street;
+ find('recordStreet').textContent=card.street;
+ find('recordBody').textContent=card.body;
+ const [name,stat,rule,unlock]=effects[card.id];
+ const [type,value]=stat.split(' · ');
+ find('effectName').textContent=name;
+ find('effectType').textContent=value.endsWith(' ход')?type+' на ход':type;
+ find('effectPoints').textContent=Number.parseInt(value,10);
+ find('effectRule').textContent=rule;
+ find('unlockRule').textContent=unlock;
+ updateCollection();
+ flip(false);
+}
+cards.forEach((card,i)=>{
+ const button=document.createElement('button');
+ button.type='button';
+ button.className='card-frame anomaly-face deck-tile';
+ button.dataset.zone=cardZones[card.street];
+ const copy=document.createElement('div');
+ const title=document.createElement('strong');
+ title.className='card-title';
+ title.textContent=thumbnailTitles[card.id]??card.title;
+ const street=document.createElement('small');
+ street.className='card-zone';
+ street.textContent=card.street;
+ const collected=document.createElement('small');
+ collected.className='collected';
+ collected.textContent='В коллекции';
+ collectionLabels.set(card.id,collected);
+ copy.append(title,street,collected);
+ const art=image(card.src);
+ art.loading='lazy';
+ const portrait=document.createElement('div');
+ portrait.className='portrait';
+ portrait.append(art);
+ const effect=document.createElement('span');
+ effect.className='tile-effect';
+ effect.textContent=effects[card.id][1];
+ button.setAttribute('aria-label',[card.title,card.street,effect.textContent].join(', '));
+ button.append(portrait,copy,effect);
+ button.onclick=()=>{showCard(i);dialog.showModal()};
+ find('deckGrid').append(button);
+});
+updateCollection();
+collect.onclick=()=>{
+ collection.add(cards[cardIndex].id);
+ try{localStorage.setItem(collectionKey,JSON.stringify([...collection]))}catch{}
+ updateCollection();
+ find('flipCard').focus();
+};
+find('closeCard').onclick=()=>dialog.close();
+find('flipCard').onclick=()=>flip(find('cardBack').hidden);
+find('cardPrev').onclick=()=>showCard(cardIndex-1);
+find('cardNext').onclick=()=>showCard(cardIndex+1);
+addEventListener('keydown',event=>{
+ if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+ const delta=event.key==='ArrowLeft'?-1:1;
+ if(dialog.open){event.preventDefault();showCard(cardIndex+delta)}
+ else if(activeTab==='posters'){event.preventDefault();showPoster(posterIndex+delta)}
+});
+</script>
+</html>

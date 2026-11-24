@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c131b">
+<title>NEVALIS — От КПП до рассвета</title>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#0c131b;color:#f4f0e8;--edge:#39464e;--accent:#a9e9df}
+@font-face{font-family:"Nevalis Pixel";src:url(./assets/e408d8b335fd1e692425bb2d.ttf) format("truetype");font-display:swap}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+main{width:100%;height:100vh;height:100dvh}
+#view{position:relative;isolation:isolate;overflow:hidden;overflow:clip;width:100%;height:100%;background:#050d16;touch-action:none}
+#view:focus{outline:none}
+#wordmark{position:absolute;z-index:5;top:max(18px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left));margin:0;font:normal clamp(25px,4vw,52px)/1 "Nevalis Pixel",monospace;color:#fff3dd;text-shadow:2px 3px #0a121a;pointer-events:none}
+#hudBottom{position:absolute;z-index:5;bottom:0;left:0;right:0;padding:28px 18px max(15px,env(safe-area-inset-bottom));background:linear-gradient(transparent,#071018b8);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
+#zoneTitle{margin:0;color:#faf0db;text-shadow:1px 2px #091018;text-align:center;font-size:clamp(14px,2vw,19px);font-weight:650}
+#introHint{position:absolute;z-index:5;bottom:70px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 28px);padding:9px 14px;margin:0;text-align:center;color:#f6eee1;background:#101a25e8;border:1px solid #56636a;border-radius:4px;font-size:14px;pointer-events:none}
+#introHint .touch-hint{display:none}
+#menuButton{position:absolute;z-index:6;top:max(15px,env(safe-area-inset-top));right:max(15px,env(safe-area-inset-right));width:44px;height:44px;display:grid;place-items:center;padding:0;color:#fff3dd;border:1px solid #66757b;background:#111b24dc;border-radius:4px;cursor:pointer}
+#menuButton span{width:18px;height:2px;background:currentColor;box-shadow:0 -6px currentColor,0 6px currentColor}
+#menuDialog{margin:max(15px,env(safe-area-inset-top)) max(15px,env(safe-area-inset-right)) auto auto;width:min(320px,calc(100vw - 30px));padding:18px}
+#menuDialog::backdrop,#sectionDialog::backdrop{background:#051019b8}
+#menuDialog header{margin-bottom:8px}
+#menuDialog nav{display:grid;gap:5px}
+#menuDialog nav button{width:100%;text-align:left;padding:12px;border:1px solid transparent;border-radius:3px;background:#192831;color:#fff3dd;cursor:pointer}
+#menuDialog nav button:hover,#menuDialog nav button:focus-visible{border-color:var(--accent);background:#233941}
+#menuDialog .menu-extra{margin-top:10px;border-top:1px solid var(--edge);padding-top:9px}
+#menuDialog .menu-extra button{font-size:14px;color:#ccdadb;background:transparent}
+#sectionDialog{width:min(1080px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:clamp(14px,3vw,28px);overscroll-behavior:contain}
+#sectionDialog header{position:sticky;top:-1px;z-index:1;background:#111c24}
+#sectionDialog header h2{font-size:clamp(21px,4vw,32px)}
+#sectionDialog .section-intro{margin:0 0 16px;color:#d1e3de}
+.panel-button{padding:8px 11px;min-height:44px;border-radius:4px;border:1px solid #53656e;background:#1a2a34;color:#fff3dd;cursor:pointer}
+#workGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:13px}
+#workGrid .work-tile{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;min-width:0;text-align:left;padding:0;border:1px solid #43545b;background:#18242c;overflow:hidden;border-radius:4px;color:#fff3dd;cursor:pointer}
+#workGrid .work-tile:hover{border-color:var(--accent);background:#22343d}
+#workGrid .work-tile img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;margin:0;background:#0a1219}
+#workGrid .work-tile span{display:block;padding:10px 11px;line-height:1.3}
+.section-empty{padding:14px 0 8px}
+.contact-link{color:#d6eb98;text-underline-offset:4px}
+#sectionDialog.shop-open{width:min(1360px,calc(100vw - 16px));padding:12px;overflow:hidden}
+#shopFrame{display:block;width:100%;height:calc(100dvh - 108px);border:0;background:#101719}
+dialog header{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--edge);padding:0 0 14px;margin-bottom:12px}
+#world{position:absolute;top:0;left:0;width:7699px;height:675px;transform-origin:top left;background:url('./assets/15d52d812019378816670135.png') 0 0/1838px 675px no-repeat,url('./assets/fb4938e011e6792420b39995.png') 1838px 0/1850px 675px no-repeat,url('./assets/9e8ca4bd776eb6d9ebe22991.png') 3688px 0/1318px 675px no-repeat,url('./assets/e5676cb8144c9e25510c2d84.png') 5006px 0/1497px 675px no-repeat,url('./assets/b3a2bc62fbbf56fea9fbc1ad.png') 6503px 0/1196px 675px no-repeat;image-rendering:pixelated}
+#actor{position:absolute;top:431px;width:76px;height:119px;background:url('./assets/60f8fe910c1d6273ec741fb1.png') 0 0/380px 119px no-repeat;image-rendering:pixelated;pointer-events:none;z-index:3}
+.item{position:absolute;z-index:1;display:block;border:0;padding:0;background:none;cursor:pointer;overflow:visible}
+.item img{height:100%;width:100%;object-fit:contain;display:block;image-rendering:pixelated;transition:filter .15s}
+#frog{left:236px;top:386px;width:66px;height:84px}
+#eyes{left:1484px;top:405px;width:71px;height:89px}
+#kwak{left:1726px;top:318px;width:78px;height:64px}
+.peek img{object-position:center top;transition:transform .24s,filter .15s}
+#frog,#eyes{transition:transform .45s ease-out}
+#frog img{filter:brightness(.80) sepia(.08)}
+#eyes img{filter:brightness(.71) sepia(.12)}
+#kwak img{transform:translateY(6px);filter:brightness(.76) saturate(1.15)}
+#frog.near{transform:translate(139px,52px)}
+#eyes.near{transform:translate(-110px,40px)}
+@media(prefers-reduced-motion:reduce){#frog,#eyes,.peek img{transition:none}}
+#kwak:hover img,#kwak:focus-visible img,#kwak.near img{transform:translateY(0)}
+.foreground{position:absolute;z-index:2;pointer-events:none}
+#car-front{left:223px;top:395px}
+#barrier-front{left:1476px;top:453px}
+#window-front{left:1719px;top:282px}
+#poster{left:7143px;top:262px;width:48px;height:56px}
+#poster .sheet{display:block;width:100%;height:100%;overflow:hidden;background:#14232a;clip-path:polygon(1% 2%,92% 0,100% 8%,99% 97%,8% 100%,0 92%);transform:rotate(-2deg)}
+#poster img{object-fit:cover;transform:scale(1.17);filter:brightness(.76) sepia(.16);opacity:.83}
+.item:hover img,.item:focus-visible img{filter:brightness(1.26)!important}
+#bull{left:2227px;top:369px;width:69px;height:49px}
+#abstract{left:2370px;top:327px;width:42px;height:44px}
+#mechanisms{left:3215px;top:370px;width:67px;height:49px}
+.street-print{background:#18252c;box-shadow:1px 1px 2px #02080caa;transform:rotate(-2deg)}
+.street-print img{object-fit:cover;filter:brightness(.72) sepia(.12);opacity:.9}
+#abstract{border:3px solid #2d3739;background:#102730;transform:none}
+#abstract img{filter:brightness(.61) saturate(.76)}
+#abstract.near img{filter:brightness(.97)}
+#robot{left:2708px;top:418px;width:113px;height:132px}
+#organic{left:3409px;top:409px;width:96px;height:83px;transition:transform .25s ease}
+#bird{left:3524px;top:393px;width:81px;height:67px;transform-origin:22% 95%;transition:transform .24s ease}
+#robot img{filter:brightness(.78) sepia(.16)}
+#robot.near img{transform:translateY(-2px)}
+#organic img{filter:brightness(.81) sepia(.21)}
+#organic.near{transform:translate(-6px,3px)}
+#bird img{filter:brightness(.79) saturate(1.18)}
+#bird.near{transform:rotate(-6deg)}
+#street-front{left:3370px;top:457px}
+@media(prefers-reduced-motion:reduce){#organic,#bird{transition:none}}
+
+#bolvanchik{left:3840px;top:394px;width:103px;height:100px;transition:transform .35s ease}
+#bolvanchik img{filter:brightness(.71) sepia(.17)}
+#bolvanchik.near{transform:translate(-72px,36px)}
+#toothy{left:4150px;top:238px;width:78px;height:99px}
+#toothy img{filter:brightness(.56) saturate(1.12);transform:translateY(8px);transition:transform .25s,filter .25s}
+#toothy.near img{transform:translateY(-2px);filter:brightness(.99) saturate(1.14)}
+#head-panel{left:4436px;top:371px;width:43px;height:31px;transform:rotate(-1deg);border:2px solid #46392c}
+#head-panel img{filter:brightness(.68) sepia(.22)}
+#elongated{left:4734px;top:351px;width:128px;height:97px;transition:transform .24s ease}
+#elongated img{transform:scaleX(-1);filter:brightness(.74) sepia(.15)}
+#elongated.near{transform:translateX(-7px) rotate(-4deg)}
+#gate-box-front{left:3867px;top:398px}
+#broken-window-front{left:4141px;top:232px}
+#broken-wall-front{left:4790px;top:335px}
+@media(prefers-reduced-motion:reduce){#bolvanchik,#toothy img,#elongated{transition:none}}
+#plant{left:5047px;top:398px;width:83px;height:101px;transform-origin:50% 94%}
+#root-eater{left:5292px;top:399px;width:90px;height:111px}
+#gertomor{left:5637px;top:380px;width:91px;height:140px;transform-origin:50% 96%}
+#unicorn{left:5922px;top:394px;width:87px;height:111px}
+#nosach{left:6209px;top:413px;width:94px;height:127px;transform-origin:50% 100%}
+#plant,#root-eater,#gertomor,#unicorn,#nosach{transition:transform .25s ease}
+#plant img{filter:brightness(.8) saturate(.83)}
+#root-eater img,#unicorn img{filter:brightness(.83) sepia(.12)}
+#gertomor img{filter:brightness(.83)}
+#nosach img{filter:brightness(.81) saturate(.79)}
+#plant.near,#gertomor.near{transform:rotate(-5deg)}
+#root-eater.near{transform:translate(-29px,12px)}
+#unicorn.near{transform:translate(22px,4px)}
+#nosach.near{transform:rotate(6deg)}
+#nosach::before{content:'';position:absolute;bottom:-2px;left:19%;width:62%;height:5px;border-radius:50%;background:#03090cac;z-index:-1}
+#rubble-front{left:5033px;top:413px}
+#roots-front{left:5288px;top:452px}
+#flowers-front{left:5626px;top:446px}
+#arch-foot-front{left:5917px;top:409px}
+@media(prefers-reduced-motion:reduce){#plant,#root-eater,#gertomor,#unicorn,#nosach{transition:none}}
+#ant-panel{left:6568px;top:359px;width:42px;height:42px;border:2px solid #484643}
+#double{left:6649px;top:176px;width:347px;height:313px;visibility:hidden;z-index:2;transform-origin:50% 89%}
+#double img{object-fit:fill;filter:brightness(.81) saturate(.85) drop-shadow(0 3px 4px #1b0608ac)}
+#double:hover img,#double:focus-visible img{filter:brightness(.94) saturate(.9)!important}
+#rift-left{left:6619px;top:237px}
+#rift-right{left:6942px;top:226px}
+#rift-sill{left:6715px;top:466px;z-index:2}
+.rift-edge{z-index:1}
+.final-open #double{visibility:visible;animation:climb-out 1.5s ease-out both}
+.final-open #rift-left{animation:edge-left 1.5s ease-out both}
+.final-open #rift-right{animation:edge-right 1.5s ease-out both}
+@keyframes climb-out{
+ 0%{transform:translateY(-23px) scale(.63);opacity:0;filter:brightness(.47)}
+ 24%{opacity:1;transform:translateY(-17px) scale(.83);filter:brightness(.75)}
+ 60%{transform:translateY(-3px) scale(.97);filter:brightness(.95)}
+ 100%{transform:none;opacity:1;filter:none}
+}
+@keyframes edge-left{0%,20%{transform:none} 65%{transform:translate(-11px,1px)} 82%{transform:translate(-9px,0)} 100%{transform:translate(-11px,1px)}}
+@keyframes edge-right{0%,20%{transform:none} 65%{transform:translate(12px,2px)} 82%{transform:translate(10px,1px)} 100%{transform:translate(12px,2px)}}
+@media(prefers-reduced-motion:reduce){
+ .final-open #double,.final-open #rift-left,.final-open #rift-right{animation:none}
+}
+dialog img[hidden]{display:none}
+#cardCredit{color:#9cc3bd;font-size:.9rem;margin-bottom:9px}
+#cardNote{color:#e2ba90;margin-top:10px}
+#fieldLog{margin-top:15px;padding:10px 12px;border:1px solid #48555b;border-radius:3px;background:#0c161b}
+#fieldLog summary{cursor:pointer;font-weight:650;color:#e1dbc7}
+#fieldLog summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#fieldLog[open] summary{border-bottom:1px solid #455054;padding-bottom:8px;margin-bottom:9px}
+#fieldLog #fieldLabel{font-size:.88rem;color:#9cc3bd;margin-bottom:5px}
+dialog.final-card{border-color:#915345}
+dialog.final-card #cardText{font-size:clamp(19px,4.5vw,28px);color:#ffc4ad}
+button{font:inherit;color:inherit}
+.controls{display:none;justify-content:center;gap:8px;pointer-events:auto}
+.controls button,#close{border:1px solid var(--edge);background:#18232d;padding:9px 13px;border-radius:4px;cursor:pointer;min-height:44px}
+.controls button:active{background:#294940}.controls button:disabled{opacity:.45;cursor:default}
+[data-dir]{touch-action:none}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+dialog{width:min(92vw,510px);max-height:90svh;overflow:auto;border:1px solid #587176;background:#111c24;color:#f4f0e8;padding:20px;box-shadow:0 20px 80px #000a}
+dialog::backdrop{background:#04090ee0}
+dialog h2{margin:0;font-size:26px}
+dialog img{display:block;width:100%;height:min(48svh,365px);margin:14px 0;object-fit:contain;background:#080f16}
+dialog p{margin:0;color:#cad4d9;line-height:1.5}
+@media(any-pointer:coarse){
+ .controls{display:flex}
+ #introHint{bottom:117px}
+}
+@media(pointer:coarse){
+ #introHint .touch-hint{display:inline}
+ #introHint .keyboard-hint{display:none}
+}
+</style>
+<main>
+<div id="view" tabindex="-1" aria-label="Игровая сцена">
+ <div id="world">
+  <button id="frog" class="item peek" aria-label="Осмотреть существо у машины"><img src="./assets/3d87a3cabb7d28b3ed983052.png" alt=""></button>
+  <button id="poster" class="item" aria-label="Открыть работу Печенье"><span class="sheet"><img src="./assets/72d9825ecdf43aadaca4d2a3.png" alt=""></span></button>
+  <button id="eyes" class="item peek" aria-label="Осмотреть большеглазое существо"><img src="./assets/f114ae56732ec219187c9f82.png" alt=""></button>
+  <button id="kwak" class="item peek" aria-label="Осмотреть Мадам Квак"><img src="./assets/7762e87eede5c64133199890.png" alt=""></button>
+  <img id="car-front" class="foreground" src="./assets/13b7624f35e678dc1b741e72.png" alt="" aria-hidden="true">
+  <img id="barrier-front" class="foreground" src="./assets/910705e243d7a3bac6b043fd.png" alt="" aria-hidden="true">
+  <img id="window-front" class="foreground" src="./assets/a2c2b4e546e0f31031395c88.png" alt="" aria-hidden="true">
+  <button id="bull" class="item street-print" aria-label="Открыть работу Бык"><img src="./assets/c03ba787f54f15f0601388de.png" alt=""></button>
+  <button id="abstract" class="item street-print" aria-label="Открыть абстрактный скетч"><img src="./assets/fd71a9cb2da08e70d30fc197.png" alt=""></button>
+  <button id="robot" class="item" aria-label="Осмотреть Робот.EXE"><img src="./assets/7e012e6571b22e60375c7b4a.png" alt=""></button>
+  <button id="mechanisms" class="item street-print" aria-label="Открыть эскизы механизмов"><img src="./assets/7201ddd47a43a3f35740f7ea.png" alt=""></button>
+  <button id="organic" class="item" aria-label="Осмотреть органическо-механическое существо"><img src="./assets/8b5d2bb13e6803f6db7e9241.png" alt=""></button>
+  <button id="bird" class="item" aria-label="Осмотреть Птицу"><img src="./assets/853cf8bd11bb6096ab975d2c.png" alt=""></button>
+  <img id="street-front" class="foreground" src="./assets/2ce060ccaeacbb89d0543f00.png" alt="" aria-hidden="true">
+  <button id="bolvanchik" class="item" aria-label="Осмотреть Болванчика"><img src="./assets/8488ddc03e1dfae92b5c757d.png" alt=""></button>
+  <button id="toothy" class="item" aria-label="Осмотреть Зубастика"><img src="./assets/4f040c53d8b0fb1d55afedf8.png" alt=""></button>
+  <button id="head-panel" class="item street-print" aria-label="Открыть рисунок биомеханической головы"><img src="./assets/726783551863aa9af586c612.png" alt=""></button>
+  <button id="elongated" class="item" aria-label="Осмотреть существо с вытянутой головой"><img src="./assets/f26278b7660ee0463f6553a1.png" alt=""></button>
+  <img id="gate-box-front" class="foreground" src="./assets/3e507a199ee62b2a740962b2.png" alt="" aria-hidden="true">
+  <img id="broken-window-front" class="foreground" src="./assets/6d4786c1ad54c908148e3356.png" alt="" aria-hidden="true">
+  <img id="broken-wall-front" class="foreground" src="./assets/6fb10ac75612873746d47ad0.png" alt="" aria-hidden="true">
+  <button id="plant" class="item" aria-label="Осмотреть растительное существо"><img src="./assets/257316e38361c2252588e683.png" alt=""></button>
+  <button id="root-eater" class="item" aria-label="Осмотреть Корнееда"><img src="./assets/f85feaf9d9d6b819a8910a94.png" alt=""></button>
+  <button id="gertomor" class="item" aria-label="Осмотреть Гертомора"><img src="./assets/617f9196d0ef40f6a766e916.png" alt=""></button>
+  <button id="unicorn" class="item" aria-label="Осмотреть Единорога"><img src="./assets/4e177cd07a6fad653290369b.png" alt=""></button>
+  <button id="nosach" class="item" aria-label="Осмотреть Носача"><img src="./assets/095fac7a9ec1c03e6694cd2a.png" alt=""></button>
+  <img id="rubble-front" class="foreground" src="./assets/d70e3a4cc0c04caa02d09440.png" alt="" aria-hidden="true">
+  <img id="roots-front" class="foreground" src="./assets/d4bea6a947a9bc4164fed094.png" alt="" aria-hidden="true">
+  <img id="flowers-front" class="foreground" src="./assets/2ff48cfa09ad65fd7fa2fa9d.png" alt="" aria-hidden="true">
+  <img id="arch-foot-front" class="foreground" src="./assets/d8456903bed334a84a9a878c.png" alt="" aria-hidden="true">
+  <button id="ant-panel" class="item street-print" aria-label="Открыть рисунок существа, напоминающего муравья"><img src="./assets/c43310fcaef650a0a3347d54.png" alt=""></button>
+  <img id="rift-left" class="foreground rift-edge" src="./assets/610c919f9bb5118440f376f1.png" alt="" aria-hidden="true">
+  <img id="rift-right" class="foreground rift-edge" src="./assets/772c989f61b60e1fef679ee5.png" alt="" aria-hidden="true">
+  <button id="double" class="item" aria-label="Поговорить с Создателем аномальной зоны" disabled><img src="./assets/4e2e6626454dcfc30823e668.png" alt=""></button>
+  <img id="rift-sill" class="foreground" src="./assets/b9fe32cd13f0bd0462f56275.png" alt="" aria-hidden="true">
+  <div id="actor" role="img" aria-label="Аким"></div>
+ </div>
+ <h1 id="wordmark">NEVALIS</h1>
+ <button id="menuButton" type="button" aria-label="Открыть меню" aria-haspopup="dialog"><span aria-hidden="true"></span></button>
+ <p id="introHint"><span class="keyboard-hint">A / D или ← / → — идти. E — осмотреть находку.</span><span class="touch-hint">Удерживай кнопку направления, чтобы идти. Нажми на находку, чтобы осмотреть её.</span></p>
+ <div id="hudBottom">
+  <p id="zoneTitle">ул. Заброшенный пост</p>
+  <div class="controls" aria-label="Управление">
+   <button data-dir="-1" aria-label="Идти влево">←</button>
+   <button data-dir="1" aria-label="Идти вправо">→</button>
+   <button id="inspect" disabled>Осмотреть</button>
+  </div>
+ </div>
+</div>
+</main>
+<dialog id="menuDialog" aria-labelledby="menuTitle">
+ <header><h2 id="menuTitle">Меню</h2><form method="dialog"><button class="panel-button" aria-label="Закрыть меню">Закрыть</button></form></header>
+ <nav aria-label="Разделы NEVALIS">
+  <button type="button" data-section="exhibition">Выставка</button>
+  <button type="button" data-section="shop">Магазин</button>
+  <button type="button" data-section="contacts">Контакты</button>
+ </nav>
+ <nav class="menu-extra" aria-label="Управление прогулкой">
+  <button type="button" id="resumeGame">Вернуться к прогулке</button>
+  <button type="button" id="fullscreen" aria-pressed="false" hidden>На весь экран</button>
+ </nav>
+</dialog>
+<dialog id="sectionDialog" aria-labelledby="sectionTitle">
+ <header><h2 id="sectionTitle" tabindex="-1"></h2><form method="dialog"><button class="panel-button">К прогулке</button></form></header>
+ <section id="exhibition" aria-label="Выставка">
+  <p class="section-intro">Аким Небылицын (Nevalis) · 23 работы</p>
+  <div id="workGrid"></div>
+ </section>
+ <section id="shop" aria-label="Магазин" hidden><iframe id="shopFrame" title="Магазин NEVALIS" data-src="./shop/"></iframe></section>
+ <section id="contacts" class="section-empty" aria-label="Контакты" hidden><p>Связаться с NEVALIS в Telegram</p><p><a class="contact-link" href="https://t.me/kukiminer" target="_blank" rel="noopener noreferrer">@kukiminer</a></p></section>
+</dialog>
+<dialog id="workDialog" aria-labelledby="cardTitle">
+ <header><h2 id="cardTitle"></h2><form method="dialog"><button id="close" autofocus>Закрыть</button></form></header>
+ <img id="cardArt" alt="">
+ <p id="cardCredit" hidden></p>
+ <p id="cardText"></p>
+ <p id="cardNote" hidden></p>
+ <details id="fieldLog" hidden>
+  <summary>Записка исследователей</summary>
+  <p id="fieldLabel"></p>
+  <p id="fieldBody"></p>
+ </details>
+</dialog>
+<script>
+const world = document.querySelector('#world');
+const view = document.querySelector('#view');
+const actor = document.querySelector('#actor');
+const inspect = document.querySelector('#inspect');
+const dialog = document.querySelector('#workDialog');
+const menuDialog = document.querySelector('#menuDialog');
+const sectionDialog = document.querySelector('#sectionDialog');
+const sectionTitle = document.querySelector('#sectionTitle');
+const fieldLog = document.querySelector('#fieldLog');
+const fieldLabel = document.querySelector('#fieldLabel');
+const fieldBody = document.querySelector('#fieldBody');
+const zoneTitle = document.querySelector('#zoneTitle');
+const introHint = document.querySelector('#introHint');
+const fullscreen = document.querySelector('#fullscreen');
+const dismissIntro = () => { introHint.hidden = true; };
+setTimeout(dismissIntro, 12000);
+fullscreen.hidden = !document.fullscreenEnabled;
+fullscreen.addEventListener('click', async () => {
+ clearInput();
+ menuDialog.close();
+ view.focus({preventScroll:true});
+ try {
+  if(document.fullscreenElement)await document.exitFullscreen();
+  else await document.documentElement.requestFullscreen();
+ } catch {
+  fullscreen.hidden=true;
+ }
+});
+document.addEventListener('fullscreenchange',()=>{
+ const active=Boolean(document.fullscreenElement);
+ fullscreen.setAttribute('aria-pressed',String(active));
+ fullscreen.textContent=active?'Выйти из полноэкранного режима':'На весь экран';
+});
+const worldWidth = 7699;
+const streetStart = 1838;
+const anomalyStart = 3688;
+const ruinsStart = 5006;
+const finalStart = 6503;
+const doubleTrigger = 6689;
+const cards = [
+ {id:'frog', x:270, outsideX:408, title:'Лягушкообразное существо', credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч лягушкообразного существа с широкой пастью и выпуклыми глазами.",note:"История аномалии в разработке. Существо обещало дать комментарий после дождя.",art:'./assets/1c84c9e1a9d95ead69c07499.png',record:{"label": "КПП · журнал дежурного", "body": "Первый раз услышали кваканье из-под капота. Двигатель был снят ещё до закрытия КПП. На следующий день существо повторило сигнал старого клаксона, и охранник по привычке поднял шлагбаум."}},
+ {id:'eyes', x:1519, outsideX:1409, title:'Большеглазое существо', credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч существа с двумя круглыми глазами и тонким отростком сбоку.",note:"История аномалии в разработке. Зато оно уже заметило, что за ним наблюдают.",art:'./assets/88f207b86463b8417d1d10eb.png',record:{"label": "КПП · протокол наблюдения", "body": "За бетонным блоком видны два глаза. При осмотре с двух сторон один наблюдатель всегда видел левый глаз, другой — тоже левый. Объект просьба пока считать одним."}},
+ {id:'kwak', x:1765, title:'Мадам Квак', credit:"Аким Небылицын (Nevalis) · 2026 · Линеры",text:"Графический скетч лягушкоподобного существа с огромными глазами.",note:"История Мадам Квак в разработке. На вопросы она пока отвечает только взглядом.",art:'./assets/f552c3233e6f394f995e92e7.png',record:{"label": "КПП · запись ночной смены", "body": "В 03:12 в нижней части окна появилась Мадам Квак. Стажёр помахал ей. Наутро на стекле с внутренней стороны нашли отпечаток его ладони."}},
+ {id:'bull', x:2261, title:'Бык', credit:"Аким Небылицын (Nevalis) · 2026",text:"Графический скетч фантастической головы с вытянутой мордой и длинным рогом.",note:"История аномалии в разработке. Издалека все называют его быком. Вблизи уточнять никто не берётся.",record:{"label": "Заводская улица · протокол у ворот", "body": "Бык бросается на всё, что движется. Вчера он трижды протаранил ворота, перепутав своё отражение с соперником. В четвёртый раз ворота уже были открыты, но он всё равно разогнался и ударил в косяк. В отчёте записали: «Агрессивен. Учится медленно»."}},
+ {id:'abstract', x:2391, title:'Скетч без названия', credit:"Аким Небылицын (Nevalis) · 2026",text:"Абстрактный скетч с цветными пятнами и графическими деталями.",note:"История аномалии в разработке. Экран показывает что-то, но инструкцию к нему пока ищут.",record:{"label": "Заводская улица · записка у экрана", "body": "Говорят, через этот экран когда-то можно было связаться с другим миром, где аномалий нет. Последний дежурный записал, что в ответ на проверку связи кто-то пожаловался на обычный дождь. Экран давно не работает, и на такой разговор теперь готовы потратить всю смену."}},
+ {id:'robot', x:2765, title:'Робот.EXE', art:'./assets/e3d7c90aa43890e10f0b336e.png', credit:"Аким Небылицын (Nevalis), KirainVoid · 2026 · Ручка на бумаге",text:"Совместная работа над образом фантастического существа, сочетающего органические и механические черты.",record:{"label": "Заводская улица · тетрадь первой экспедиции", "body": "Первая группа собрала Робота.EXE из местных аномалий и тела погибшего товарища. Машина должна была прокладывать дорогу там, где человек уже не мог пройти. На первом испытании она вывела двоих из цеха, а потом ушла обратно одна. На вопрос «зачем?» по рации прозвучало имя третьего."}},
+ {id:'mechanisms', x:3248, title:'Эскизы механизмов', credit:"Аким Небылицын (Nevalis) · 2026",text:"Лист с эскизами механизмов и отдельных деталей.",note:"История аномалии в разработке. Часть чертежей вроде бы прочитали. Собрать по ним пока ничего не рискнули."},
+ {id:'organic', x:3457, title:'Без названия', art:'./assets/74fe4cddd0fab9c54479c9a3.png', credit:"Аким Небылицын (Nevalis) · 2026 · Ручка на бумаге",text:"Скетч существа, в котором живые формы переплетаются с механическими.",note:"История аномалии в разработке. Инструкция по сборке, кажется, тоже.",record:{"label": "Заводская улица · наблюдение на рассвете", "body": "На рассвете из-под крана иногда слышен тонкий свист. Существо приподнимает голову, поворачивается вслед за светом и уходит вдоль труб. На группу оно пока не реагировало, даже когда мы стояли совсем рядом."}},
+ {id:'bird', x:3564, title:'Птица', art:'./assets/8bada150c94de55ce3c605cb.png', credit:"Аким Небылицын (Nevalis) · 2026 · Цифровая графика (iPad и стилус)",text:"Цифровой рисунок красного фантастического существа, напоминающего птицу.",note:"История аномалии в разработке. Маршрут её перелётов тоже.",record:{"label": "Заводская улица · наблюдение у корней", "body": "Красная птица появляется, когда в витках кабеля гаснет свет. На кадре после её взлёта в пыли остаётся один след, похожий на отпечаток крыла. Следов лап пока нет."}},
+ {id:'bolvanchik', x:3891, outsideX:3819, title:'Болванчик', art:'./assets/1b9b2d019796f1f710968ab0.png', credit:"Аким Небылицын (Nevalis) · 2026 · Линеры",text:"Персонаж, вдохновлённый пластилиновой фигуркой. Работа передаёт его форму и характер в графике. Персонаж не является полностью авторской разработкой.",record:{"label": "Разрушенный цех · записка у щитка", "body": "Положили перед нишей гайку, чтобы отметить расстояние до стены. Из темноты вытянулась рука, взяла гайку и положила её на два сантиметра ближе. Третий замер мы не проводили."}},
+ {id:'toothy', x:4189, title:'Зубастик', art:'./assets/5bb6e81777eb9d2ede18838f.png', credit:"Аким Небылицын (Nevalis) · 2026 · Цифровая графика (iPad и стилус)",text:"Персонаж из серии фантастических существ, выполненных в образе сшитых из мешковины и других тканей созданий. Изначально образ был создан самостоятельно, без опоры на предварительные наброски. Позже работа была дополнена визуальными эффектами, которые придали персонажу более агрессивный и жуткий вид.",record:{"label": "Разрушенный цех · журнал у окна", "body": "При свете фонаря различимы швы на мешковине. Нитка, оставленная на подоконнике, к утру исчезла. На следующей фотографии у существа появился ещё один шов, точно под левым глазом."}},
+ {id:'head-panel', x:4458, title:'Скетч без названия', credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч биомеханической головы с вытянутым силуэтом и органическими деталями.",note:"История аномалии в разработке. Назначение деталей выясняется, трогать их пока не советуют.",record:{"label": "Разрушенный цех · заметка на обороте схемы", "body": "На обороте рисунка стоит дата: 2026 год. Подписи нет, только исправления поверх ранних контуров. Возможно, это одна из первых разработок Создателя аномальной зоны, когда о нём ещё никто не знал."}},
+ {id:'elongated', x:4798, title:'Скетч без названия', art:'./assets/aa8a3686d2be1c6943493bf2.png', credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч существа с вытянутой головой, прорисованной в профиль.",note:"История аномалии в разработке. Фас найти не удалось: оно всё время отворачивается.",record:{"label": "Разрушенный цех · наблюдение у пролома", "body": "Когда прожектор направили на стену, существо повернуло голову в тень. Повторили опыт с двух сторон: голову удалось увидеть целиком, но на обоих снимках она снята в профиль."}},
+ {id:'plant',x:5089,title:'Скетч без названия',art:'./assets/1e168e458ccdf48f67870912.png',credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч оранжевого растительного существа с глазами и длинными зелёными отростками.",note:"История аномалии в разработке. В журнале пока записано: «Не поливать».",record:{"label": "Заросшие руины · журнал оранжевого образца", "body": "Поставили горшок на метку у плиты. Через час горшок стоял там же, а метка оказалась на три сантиметра правее. Проверили линейку. Линейка тоже пустила корни."}},
+ {id:'root-eater',x:5337,title:'Корнеед',art:'./assets/b35183501d5704b714db8145.png',credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч существа с гибкими отростками и деталями, похожими на детали механизма.",note:"История Корнееда в разработке. Образец корня к делу приобщили, но он пропал.",record:{"label": "Заросшие руины · слухи о Корнееде", "body": "Там, где прошёл Корнеед, красные корни аномалии обрываются, будто их перекусили у самой земли. Говорят, хозяин этого мира уже много лет пытается его отловить. Расставленные ловушки находят пустыми: Корнеед съедает корни под ними, и те проваливаются в землю."}},
+ {id:'gertomor',x:5683,title:'Гертомор',art:'./assets/9e971035b0912bc298609151.png',credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч существа с длинными свисающими отростками. Образ основан на идее товарища.",note:"История Гертомора в разработке. Пока установлено только одно: он подозрительно хорошо прижился.",record:{"label": "Заросшие руины · из журнала агронома", "body": "Приняли Гертомора за злую морковку и взялись за ботву. Он вывернулся, прокусил сапог и потащил агронома под лестницу. Агроном выскочил из сапога и убежал. К утру Гертомор снова торчал в клумбе с окровавленным шнурком в зубах. С тех пор ходим мимо клумбы только по двое."}},
+ {id:'unicorn',x:5965,title:'Единорог',art:'./assets/6a9c5882573584a3efdb6305.png',credit:"Аким Небылицын (Nevalis) · 2026",text:"Скетч фантастического существа с вытянутой мордой и поднятой лапой.",note:"История аномалии в разработке. По вопросу о роге комиссия пока спорит.",record:{"label": "Заросшие руины · легенда об арке", "body": "По легенде, Единорог однажды снял рог, чтобы пролезть под аркой, и больше за ним не вернулся. Мы нашли арку и измерили проём. Рог бы прошёл. Единорог, когда мы ему это сказали, посмотрел так, будто рога у него никогда и не было."}},
+ {id:'nosach',x:6256,title:'Носач',art:'./assets/88f281563698fdf4a5bb487d.png',credit:"Аким Небылицын (Nevalis) · 2026 · Карандашный рисунок с последующей цифровой обработкой",text:"Оригинальный персонаж, разработанный специально для создания мягкой игрушки на заказ. Идея появилась при выборе подарка на Новый год. Образ был придуман с нуля, а позднее по нему изготовили игрушку. Название совпадает с названием носача — вида обезьян, однако внешне персонаж отличается от него: у него округлая, напоминающая картофелину форма тела, розовая окраска и черты лица, скорее напоминающие человеческие.",record:{"label": "Заросшие руины · свидетельство дежурного", "body": "Дежурный потерял варежку. Носач принюхался и через час притащил целых семь: соседскую, детскую и одну, связанную на большой палец Носача. Свою дежурный так и не нашёл, зато вечером вернулся с двумя горячими пирожками. С тех пор они завтракают вместе."}},
+ {id:'ant-panel',x:6589,title:'Скетч без названия',art:'./assets/46ff4f292bfba9b52beb8fbe.png',credit:"Аким Небылицын (Nevalis) · 2026 · Цифровая графика",text:"Фантастическое существо, напоминающее муравья и изображённое анфас. На основе оригинального рисунка с помощью нейросети была создана 3D-модель, которую затем удалось использовать для создания короткого видеоролика с музыкальным сопровождением.",record:{"label": "Финальное здание · журнал ночной смены", "body": "Вечером один из исследователей оставил кусочек сахара в кружке недопитого чая. Утром сахара уже не было, а по стенке кружки мокрые муравьи шли вверх, к потолку. Последний в цепочке нёс чайную ложку."}},
+ {id:'double',x:6825,title:'Создатель аномальной зоны',final:true,text:'Ты дошёл до конца, но выход здесь не предусмотрен...)'},
+ {id:'poster',x:7167,title:'Печенье',art:'./assets/4881a9a3f12c992f164398bc.png',credit:"Аким Небылицын (Nevalis) · 2026 · Цифровая графика (iPad и стилус)",text:"Работа создана для обложки альбома «К чаю». На ней изображено печенье с искажённым человеческим лицом, встроенным в его форму."}
+];
+const keys = new Set();
+const pointers = new Map();
+let x=146, facing=1, previous=0, gait=0, scale=1, visibleWidth=1200, nearest=null;
+function measure(){
+ scale = view.clientHeight / 675;
+ visibleWidth = view.clientWidth / scale;
+}
+new ResizeObserver(measure).observe(view);
+measure();
+function clearInput(){keys.clear();pointers.clear();}
+function openCard(card, fromGallery=false){
+ if(dialog.open||(!fromGallery&&card.button.disabled))return;
+ clearInput();
+ document.querySelector('#cardTitle').textContent=card.title;
+ const art = document.querySelector('#cardArt');
+ art.hidden=Boolean(card.final);
+ if (!card.final){
+  art.src=card.art??card.button.querySelector('img').src;
+  art.alt=card.title;
+ }
+ dialog.classList.toggle('final-card',Boolean(card.final));
+ const credit = document.querySelector('#cardCredit');
+ credit.textContent=card.credit??'';
+ credit.hidden=!card.credit;
+ const note = document.querySelector('#cardNote');
+ note.textContent=card.note??'';
+ note.hidden=!card.note;
+ fieldLog.open=false;
+ fieldLog.hidden=!card.record;
+ fieldLabel.textContent=card.record?.label??'';
+ fieldBody.textContent=card.record?.body??'';
+ document.querySelector('#cardText').textContent=card.text;
+ dialog.showModal();
+}
+for(const card of cards){
+ card.button=document.getElementById(card.id);
+ card.button.onclick=()=>openCard(card);
+}
+const catalogueOrder = [
+ 'bolvanchik','organic','kwak','unicorn','robot','bird','root-eater','gertomor','bull','ant-panel',
+ 'poster','nosach','toothy','red-sketch','abstract','frog','eyes','plant','head-panel',
+ 'hot','mechanisms','elongated','cool-bugs'
+];
+const catalogueOnly = {
+ 'red-sketch':{title:'Скетч без названия — красный фон',credit:'Аким Небылицын (Nevalis) · 2026',
+  text:'Скетч на красном фоне.',art:'./assets/babc2f985b21284ff9a2b104.png'},
+ 'hot':{title:'Горячо',credit:'Аким Небылицын (Nevalis) · 2026',
+  text:'Рисунок и стихотворение. Текст сохранился на оригинале.',art:'./assets/3ff35faf8e5c632764a1861a.png'},
+ 'cool-bugs':{title:'Cool bugs',credit:'Аким Небылицын (Nevalis) · 2026 · Цифровой коллаж',
+  text:'Работа появилась в результате спонтанного экспериментирования с изображениями, цветами и графическими элементами. В процессе постепенно сложилась композиция с искажённым портретом, контрастными оттенками и декоративными рисунками.',art:'./assets/be055406e32cc3a2dd81054e.png'}
+};
+const exhibitionLabels = {
+ organic:'Без названия — органическо-механическое существо',
+ abstract:'Скетч без названия — абстрактная композиция',
+ 'head-panel':'Скетч без названия — биомеханическая голова',
+ elongated:'Скетч без названия — существо с вытянутой головой',
+ plant:'Скетч без названия — оранжевое растительное существо',
+ 'ant-panel':'Без названия — существо, напоминающее муравья'
+};
+
+function populateExhibition(){
+ const grid=document.querySelector('#workGrid');
+ if(grid.childElementCount)return;
+ const entries=new Map(cards.map(card=>[card.id,card]));
+ for(const id of catalogueOrder){
+  const card=entries.get(id)??catalogueOnly[id];
+  const title=exhibitionLabels[id]??card.title;
+  const tile=document.createElement('button');
+  tile.type='button';
+  tile.className='work-tile';
+  const thumbnail=document.createElement('img');
+  thumbnail.src=card.art??card.button.querySelector('img').src;
+  thumbnail.alt='';
+  thumbnail.loading='lazy';
+  thumbnail.decoding='async';
+  const caption=document.createElement('span');
+  caption.textContent=title;
+  tile.append(thumbnail,caption);
+  tile.onclick=()=>openCard({...card,title},true);
+  grid.append(tile);
+ }
+}
+
+const menuButton=document.querySelector('#menuButton');
+menuButton.onclick=()=>{
+ clearInput();
+ dismissIntro();
+ menuDialog.showModal();
+};
+document.querySelector('#resumeGame').onclick=()=>menuDialog.close();
+for(const button of menuDialog.querySelectorAll('[data-section]')){
+ button.onclick=()=>{
+  const id=button.dataset.section;
+  sectionTitle.textContent=button.textContent;
+  for(const section of sectionDialog.querySelectorAll('section'))section.hidden=section.id!==id;
+  if(id==='exhibition')populateExhibition();
+  sectionDialog.classList.toggle('shop-open',id==='shop');
+  if(id==='shop'&&!shopFrame.hasAttribute('src'))shopFrame.src=shopFrame.dataset.src;
+  menuDialog.close();
+  sectionDialog.showModal();
+  sectionDialog.scrollTop=0;
+  sectionTitle.focus({preventScroll:true});
+ };
+}
+const shopFrame=document.querySelector('#shopFrame');
+addEventListener('message',event=>{
+ if(event.source!==shopFrame.contentWindow||event.origin!==location.origin)return;
+ if(event.data==='nevalis-close-shop'&&sectionDialog.open&&!document.querySelector('#shop').hidden)sectionDialog.close();
+});
+sectionDialog.addEventListener('close',()=>view.focus({preventScroll:true}));
+inspect.onclick=()=>{if(nearest)openCard(nearest)};
+const doubleButton = document.querySelector('#double');
+const moves = {ArrowLeft:-1,ArrowRight:1,KeyA:-1,KeyD:1};
+addEventListener('keydown',event=>{
+ if(dialog.open||menuDialog.open||sectionDialog.open)return;
+ if(event.code in moves){event.preventDefault();keys.add(event.code);}
+ if(event.code==='KeyE' && !event.repeat && nearest)openCard(nearest);
+});
+addEventListener('keyup',event=>keys.delete(event.code));
+addEventListener('blur',clearInput);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInput()});
+for(const button of document.querySelectorAll('[data-dir]')){
+ button.addEventListener('pointerdown',event=>{
+  button.setPointerCapture(event.pointerId);
+  pointers.set(event.pointerId,Number(button.dataset.dir));
+ });
+ for(const name of ['pointerup','pointercancel','lostpointercapture']){
+  button.addEventListener(name,event=>pointers.delete(event.pointerId));
+ }
+}
+function distanceToCard(card){
+ const outside=card.outsideX??card.x;
+ return Math.max(0,Math.min(card.x,outside)-x,x-Math.max(card.x,outside));
+}
+function sprite(moving){
+ const frame=moving?1+Math.floor(gait)%4:0;
+ actor.style.backgroundPositionX=(-76*frame)+'px';
+ actor.style.transform='scaleX('+facing+')';
+}
+function tick(now){
+ const dt=Math.min((now-(previous||now))/1000,.05);
+ previous=now;
+ const dir=Math.sign([...keys].reduce((sum,key)=>sum+moves[key],0)+[...pointers.values()].reduce((sum,value)=>sum+value,0));
+ const old=x;
+ x=Math.max(32,Math.min(worldWidth-32,x+205*dir*dt));
+ if(dir)facing=dir;
+ if(!introHint.hidden&&Math.abs(x-146)>220)dismissIntro();
+ gait=old!==x?gait+dt*11:0;
+ sprite(old!==x);
+ actor.style.left=(Math.round(x)-38)+'px';
+ const camera=Math.max(0,Math.min(worldWidth-visibleWidth,x-visibleWidth*.37));
+ world.style.transform='translateX('+(-Math.round(camera*scale))+'px) scale('+scale+')';
+ if(doubleButton.disabled&&x>=doubleTrigger){
+  world.classList.add('final-open');
+  doubleButton.disabled=false;
+ }
+ const previousCard=nearest;
+ nearest=cards.reduce((best,card)=>{
+  if(card.button.disabled)return best;
+  const distance=distanceToCard(card);
+  const reach=card.outsideX?90:110;
+  return distance<reach&&(!best||distance<distanceToCard(best))?card:best;
+ },null);
+ if(previousCard!==nearest){
+  previousCard?.button.classList.remove('near');
+  nearest?.button.classList.add('near');
+ }
+ inspect.disabled=!nearest||dialog.open;
+ const nextZone=x<streetStart?'ул. Заброшенный пост'
+  :x<anomalyStart?'ул. Первой аномалии'
+  :x<ruinsStart?'ул. Сущностей'
+  :x<finalStart?'ул. Надежды'
+  :'ул. Смирения';
+ if(zoneTitle.textContent!==nextZone)zoneTitle.textContent=nextZone;
+ requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</html>
