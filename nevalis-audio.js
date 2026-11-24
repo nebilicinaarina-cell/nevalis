@@ -1,6 +1,6 @@
 /* NEVALIS sound extension — production site, 2026-11-25.
  * Add <script src="./nevalis-audio.js" defer></script> before </body> or </html>.
- * Does not alter game world, movement, works, shop or existing layouts.
+ * Keeps the original three-line menu button; adds ambience toggle and volume slider INSIDE that menu.
  */
 (()=>{
 'use strict';
@@ -24,7 +24,7 @@ audio.ambience.loop=true; audio.ambience.volume=.34;
 audio.steps.loop=true; audio.steps.volume=.56;
 audio.connection.volume=.9; audio.thunder.volume=.85; audio.laugh.volume=.9;
 for(const node of Object.values(audio)) node.preload='auto';
-let started=false, atmosphereOn=false, lastX=null, prevX=null;
+let started=false, atmosphereOn=false, ambienceLevel=34, lastX=null, prevX=null;
 let thunderPlayed=false, laughPlayed=false, lastFrame=0;
 const THUNDER_X=5930; // approx 570 world px before entrance to the final zone (x=6503)
 function play(name,restart=false){
@@ -37,8 +37,10 @@ function stopSteps(){stop('steps');}
 function setAmbience(value){
  atmosphereOn=Boolean(value);
  if(atmosphereOn && started && !document.hidden)play('ambience');else stop('ambience');
- toggle.textContent=atmosphereOn?'♫ Фон: вкл.':'♫ Фон: выкл.';
+ toggle.textContent=atmosphereOn?'♫ Фоновый звук: вкл.':'♫ Фоновый звук: выкл.';
  toggle.setAttribute('aria-pressed', String(atmosphereOn));
+ slider.disabled=!atmosphereOn;
+ volumeReadout.textContent=ambienceLevel+'%';
 }
 const css=document.createElement('style');
 css.textContent=`
@@ -49,16 +51,23 @@ css.textContent=`
 #nevalis-audio-intro p{font-size:13px;line-height:1.7;margin:0 0 24px;opacity:.75}
 #nevalis-audio-intro button{display:block;width:100%;cursor:pointer;color:#faf6ee;background:#2c343a;border:1px solid #a9a092;padding:13px;margin-top:10px;font:inherit}
 #nevalis-audio-intro button:hover{background:#414c51}
-#nevalis-audio-toggle{position:fixed;right:18px;top:17px;z-index:150;border:1px solid #928979;background:rgba(13,15,18,.87);color:#f4eddb;border-radius:3px;font:12px ui-monospace,monospace;cursor:pointer;padding:9px 11px}
+#nevalis-audio-control{padding:8px 0 0;border-top:1px solid #39464e;margin-top:9px}#nevalis-audio-toggle{display:block;width:100%;min-height:44px;text-align:left;border:1px solid #66757b;background:#192831;color:#f4eddb;border-radius:3px;font:14px system-ui,sans-serif;cursor:pointer;padding:11px 12px;margin-top:6px}#nevalis-audio-toggle:hover,#nevalis-audio-toggle:focus-visible{border-color:#a9e9df;background:#233941}#nevalis-audio-control[hidden]{display:none!important}#nevalis-audio-volume-label{display:flex;justify-content:space-between;align-items:center;margin:12px 3px 5px;font:13px system-ui,sans-serif;color:#d2d9d6}#nevalis-audio-volume{display:block;width:100%;margin:8px 0 8px;accent-color:#a9e9df;cursor:pointer}#nevalis-audio-volume:disabled{opacity:.45;cursor:not-allowed}
 `;
 document.head.append(css);
 const intro=document.createElement('div'); intro.id='nevalis-audio-intro';
 intro.innerHTML='<div class="audio-box" role="dialog" aria-modal="true" aria-label="Звук NEVALIS"><h2>NEVALIS</h2><p>Включить атмосферу аномальной зоны? Звуки шагов и сюжетные эффекты будут работать в обоих режимах.</p><button type="button" data-choice="on">◖)) С фоновым звуком</button><button type="button" data-choice="off">Без фонового звука</button></div>';
 document.body.append(intro);
-const toggle=document.createElement('button');toggle.id='nevalis-audio-toggle';toggle.type='button';toggle.hidden=true;
-document.body.append(toggle);setAmbience(false);
+const control=document.createElement('div');
+control.id='nevalis-audio-control';control.hidden=true;
+control.innerHTML='<button type="button" id="nevalis-audio-toggle" aria-pressed="false">♫ Фоновый звук: выкл.</button><label id="nevalis-audio-volume-label" for="nevalis-audio-volume"><span>Громкость фона</span><output id="nevalis-audio-volume-readout">34%</output></label><input type="range" id="nevalis-audio-volume" min="0" max="100" step="1" value="34" aria-label="Громкость фонового звука">';
+(menuDialog.querySelector('.menu-extra') || menuDialog).append(control);
+const toggle=control.querySelector('#nevalis-audio-toggle');
+const slider=control.querySelector('#nevalis-audio-volume');
+const volumeReadout=control.querySelector('#nevalis-audio-volume-readout');
+slider.addEventListener('input',()=>{ambienceLevel=Number(slider.value);audio.ambience.volume=ambienceLevel/100;volumeReadout.textContent=ambienceLevel+'%';});
+setAmbience(false);
 intro.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>{
-  started=true;intro.hidden=true;toggle.hidden=false;setAmbience(b.dataset.choice==='on');
+  started=true;intro.hidden=true;control.hidden=false;setAmbience(b.dataset.choice==='on');
   view.focus({preventScroll:true});
 }));
 toggle.addEventListener('click',()=>setAmbience(!atmosphereOn));
